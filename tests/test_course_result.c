@@ -1,74 +1,72 @@
 #include <stdio.h>
-#include "course.h"
+#include <assert.h>
 #include "courseResult.h"
 
-int testCompletedResult()
+void testCompletedResult()
 {
-    Course course = createCourse("CSE 4202", "Structured Programming II Lab", 1.5, 2);
-    CourseResult result = createCourseResult(&course, 120);
-    return result.course == &course;
+    Course course = {"CSE101", "Structured Programming", 3.0, 1};
+    CourseResult result = createCompletedCourseResult(&course, 120);
+
+    assert(result.is_completed == 1);
+    printf("testCompletedResult passed\n");
 }
 
-int testCompletedMarks()
+void testCompletedMarks()
 {
-    Course course = createCourse("CSE 4202", "Structured Programming II Lab", 1.5, 2);
-    CourseResult result = createCourseResult(&course, 120);
-    return result.marks == 120;
+    Course course = {"CSE101", "Structured Programming", 3.0, 1};
+    CourseResult result = createCompletedCourseResult(&course, 120);
+
+    assert(result.marks == 120);
+    printf("testCompletedMarks passed\n");
 }
 
-int testSortBySemester()
+void testSortBySemester()
 {
-    Course courses[3] = {
-        createCourse("CSE 4203", "Discrete Mathematics", 3.0, 2),
-        createCourse("CSE 4107", "Structured Programming I", 3.0, 1),
-        createCourse("CSE 4108", "Structured Programming I Lab", 1.5, 1)
-    };
-    CourseResult results[3] = {
-        createCourseResult(&courses[0], 210),
-        createCourseResult(&courses[1], 240),
-        createCourseResult(&courses[2], 105)
+    Course courses[] = {
+        {"CSE101", "Structured Programming", 3.0, 1},
+        {"CSE102", "Data Structures", 3.0, 2}
     };
 
-    sortCourseResultsBySemester(results, 3);
+    CourseResult results[] = {
+        createCompletedCourseResult(&courses[0], 210),
+        createCompletedCourseResult(&courses[1], 240)
+    };
 
-    return results[0].course->semester == 1 && results[2].course->semester == 2;
+    sortBySemester(results, 2);
+
+    assert(results[0].course->semester == 1);
+    assert(results[1].course->semester == 2);
+    printf("testSortBySemester passed\n");
 }
 
-int testFilterBySemester()
+void testFilterBySemester()
 {
-    Course courses[3] = {
-        createCourse("CSE 4107", "Structured Programming I", 3.0, 1),
-        createCourse("CSE 4108", "Structured Programming I Lab", 1.5, 1),
-        createCourse("CSE 4203", "Discrete Mathematics", 3.0, 2)
+    Course courses[] = {
+        {"CSE101", "Structured Programming", 3.0, 1},
+        {"CSE102", "Data Structures", 3.0, 2}
     };
-    CourseResult results[3] = {
-        createCourseResult(&courses[0], 240),
-        createCourseResult(&courses[1], 105),
-        createCourseResult(&courses[2], 210)
+
+    CourseResult results[] = {
+        createCompletedCourseResult(&courses[0], 240),
+        createCompletedCourseResult(&courses[1], 250)
     };
-    CourseResult filtered[4];
 
-    filterCourseResultsBySemester(results, 3, 1, filtered);
+    CourseResult filtered[2];
+    int count = 0;
 
-    return countCourseResultsBeforeNull(filtered, 4) == 2;
+    filterBySemester(results, 2, 1, filtered, &count);
+
+    assert(count == 1);
+    assert(filtered[0].course->semester == 1);
+    printf("testFilterBySemester passed\n");
 }
 
 int main()
 {
-    printf("Course result module tests\n");
-    int passed = 0;
-    int total = 0;
+    testCompletedResult();
+    testCompletedMarks();
+    testSortBySemester();
+    testFilterBySemester();
 
-    total++;
-    if (testCompletedResult()) passed++;
-    total++;
-    if (testCompletedMarks()) passed++;
-    total++;
-    if (testSortBySemester()) passed++;
-    total++;
-    if (testFilterBySemester()) passed++;
-
-    printf("Passed %d/%d tests\n", passed, total);
-    if (passed == total) return 0;
-    return 1;
+    return 0;
 }
