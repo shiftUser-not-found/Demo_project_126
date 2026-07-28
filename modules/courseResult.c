@@ -4,11 +4,21 @@
 
 Course nullCourse = {"NULL", "NULL", 0.0, 0};
 
-CourseResult createCourseResult(Course *course, double marks)
+CourseResult createCompletedCourseResult(Course *course, double marks)
 {
     CourseResult result;
     result.course = course;
+    result.is_completed = 1;
     result.marks = marks;
+    return result;
+}
+
+CourseResult createIncompleteCourseResult(Course *course)
+{
+    CourseResult result;
+    result.course = course;
+    result.is_completed = 0;
+    result.marks = 0.0;
     return result;
 }
 
@@ -77,7 +87,7 @@ void filterCourseResultsBySemester(CourseResult results[], int n_results, int se
         count++;
     }
 
-    filtered[count] = createCourseResult(&nullCourse, 0.0);
+    filtered[count] = createIncompleteCourseResult(&nullCourse);
 }
 
 int countCourseResultsBeforeNull(CourseResult results[], int n_results)
@@ -86,7 +96,7 @@ int countCourseResultsBeforeNull(CourseResult results[], int n_results)
 
     while (count < n_results)
     {
-        if (strcmp(results[count].course->code, null_course_code) == 0) return count;
+        if (strcmp(results[count].course->code, nullCourse.code) == 0) return count;
         count++;
     }
 
@@ -97,5 +107,13 @@ void viewCourseResult(CourseResult result)
 {
     printf("%s: %s\t\t [Credit: %.1f]\n",
            result.course->code, result.course->name, result.course->credit);
-    printf("Marks: %.2f\n", result.marks);
+    
+    if (result.is_completed)
+    {
+        printf("Marks: %.2f\n", result.marks);
+    }
+    else
+    {
+        printf("Status: Incomplete\n");
+    }
 }
